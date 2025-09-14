@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exams</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="card shadow p-4">
+        <h3 class="mb-4">Exams</h3>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% for item in exam_list %}
+            <div class="mb-3 p-3 border rounded">
+                <h5>{{ item.exam.title }}</h5>
+                <p>{{ item.exam.description }}</p>
+                <small>{{ item.exam.date }} | {{ item.exam.duration }} mins</small>
+
+                <div class="mt-2">
+                    <strong>Accepted Students:</strong>
+                    {% if item.accepted_students %}
+                        <ul>
+                            {% for student in item.accepted_students %}
+                                <li>{{ student.username }} ({{ student.email }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span>None</span>
+                    {% endif %}
+                </div>
+
+                <div class="mt-2">
+                    <strong>Rejected Students:</strong>
+                    {% if item.rejected_students %}
+                        <ul>
+                            {% for student in item.rejected_students %}
+                                <li>{{ student.username }} ({{ student.email }})</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span>None</span>
+                    {% endif %}
+                </div>
+
+                <!-- Optional: Edit/Delete links -->
+                <div class="mt-2">
+                    <a href="{% url 'exam-edit' item.exam.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'exam-delete' item.exam.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </div>
+            </div>
+        {% empty %}
+            <p>No exams available.</p>
+        {% endfor %}
+
+        <div class="text-end mt-3">
+            <a href="{% url 'exam-add' %}" class="btn btn-primary">Add New Exam</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
