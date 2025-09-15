@@ -7,7 +7,20 @@
 </head>
 <body class="bg-light">
 <div class="container mt-5">
-  <h3 class="mb-4">Attendance Records</h3>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Attendance Records</h3>
+    <div class="d-flex gap-2">
+        <!-- Home Button -->
+        <a href="{% url 'teacher_profile' %}" class="btn btn-outline-primary">
+            <i class="bi bi-house-fill"></i> Home
+        </a>
+        <!-- Mark Attendance Button -->
+        <a href="{% url 'attendance-mark' %}" class="btn btn-outline-danger">
+            <i class="bi bi-check2-square"></i> Mark Attendance
+        </a>
+    </div>
+</div>
+
 
   <!-- Filter Form -->
   <div class="card mb-4">

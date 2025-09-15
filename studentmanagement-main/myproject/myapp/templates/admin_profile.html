@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Admin - User List</title>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
@@ -10,7 +11,7 @@
 
     <!-- 🔹 Top bar with Logout -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>All Registered Users</h2>
+        <h2>Admin Dashboard</h2>
         <a href="{% url 'logout' %}" class="btn btn-outline-danger">
             <i class="bi bi-box-arrow-right"></i> Logout
         </a>
@@ -26,50 +27,133 @@
         {% endfor %}
     {% endif %}
 
-    <!-- 🔹 User Table -->
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>UserName</th>
-                <th>Class</th>
-                <th>Admission Date</th>
-                <th>Age</th>
-                <th>Email</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for student in students %}
-            <tr>
-                <td>{{ student.id }}</td>
-                <td>{{ student.name }}</td>
-                <td>{{ student.username }}</td>
-                <td>{{ student.class_name }}</td>
-                <td>{{ student.admission_date }}</td>
-                <td>{{ student.age }}</td>
-                <td>{{ student.email }}</td>
-                <td>
-                    <!-- Edit -->
-                    <a href="{% url 'edit_profile' student.id %}" class="btn btn-sm btn-warning">
-                        <i class="bi bi-pencil"></i>
-                    </a>
+    <!-- 🔹 All Registered Students Table -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">All Registered Students</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>UserName</th>
+                        <th>Class</th>
+                        <th>Admission Date</th>
+                        <th>Age</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for student in students %}
+                    <tr>
+                        <td>{{ student.id }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.username }}</td>
+                        <td>{{ student.class_name }}</td>
+                        <td>{{ student.admission_date }}</td>
+                        <td>{{ student.age }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>
+                            <!-- Edit -->
+                            <a href="{% url 'edit_profile' student.id %}" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
 
-                    <!-- Delete -->
-                    <a href="{% url 'delete_profile' student.id %}" class="btn btn-sm btn-danger" 
-                       onclick="return confirm('Are you sure?');">
-                        <i class="bi bi-trash"></i>
-                    </a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="8" class="text-center">No users found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                            <!-- Delete -->
+                            <a href="{% url 'delete_profile' student.id %}" class="btn btn-sm btn-danger" 
+                               onclick="return confirm('Are you sure?');">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No users found</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 🔹 Students Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Students</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+               
+                <li class="list-group-item">
+                    <a href="{% url 'student_register' %}">Register New Student</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 🔹 Teachers Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Teachers</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <a href="{% url 'all_teachers' %}">View All Teachers</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'teacher_register' %}">Register New Teacher</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'edit_teacher_profile' pk=1 %}">Edit Teacher Profile</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'delete_teacher_profile' pk=1 %}">Delete Teacher Profile</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 🔹 Exams Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Exams</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <a href="{% url 'exam-list' %}">View All Exams</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'exam-edit' pk=1 %}">Edit Exam</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'exam-delete' pk=1 %}">Delete Exam</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 🔹 Courses & Subjects Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Courses & Subjects</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <a href="{% url 'courses' %}">Courses</a>
+                </li>
+                <li class="list-group-item">
+                    <a href="{% url 'subjects' %}">Subjects</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -15,17 +15,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from django.urls import include
-
+from django.urls import path, include
+from myapp.views import landing_page
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('myapp.urls')),
-    path('', include('teachers.urls')),
-    path('', include('Exam.urls')),
-    path('', include('cources.urls')),
-    path('', include('results.urls')),
-    path('', include('attendence.urls')), # Include the app's URLs
-    path('', include('payment.urls')),
+    # Landing page at root
+    path("", landing_page, name="landing"),
+
+    # Admin
+    path("admin/", admin.site.urls),
+
+    # Apps with their own prefixes
+    path("students/", include("myapp.urls")),      # students app
+    path("teachers/", include("teachers.urls")),  # teachers app
+    path("exams/", include("Exam.urls")),         # exams app
+    path("courses/", include("cources.urls")),    # courses app
+    path("results/", include("results.urls")),    # results app
+    path("attendance/", include("attendence.urls")),  # attendance app
+    path("payment/", include("payment.urls")),    # payment app
 ]
+

@@ -10,7 +10,7 @@
 <!-- 🔹 Logout Button Top Right -->
 <div class="container mt-3">
     <div class="d-flex justify-content-end">
-        <a href="{% url 'teacher_login' %}" class="btn btn-outline-danger">
+        <a href="{% url 'landing' %}" class="btn btn-outline-danger">
             <i class="bi bi-box-arrow-right"></i> Logout
         </a>
     </div>
@@ -18,7 +18,7 @@
 
 <div class="container mt-5">
     <div class="card p-4 shadow">
-        <h3>Teacher Profile</h3>
+        <h3 class="mb-4">Teacher Profile</h3>
 
         {% if error %}
             <div class="alert alert-danger">{{ error }}</div>
@@ -28,6 +28,21 @@
             <p><strong>Name:</strong> {{ teacher.user.first_name }} {{ teacher.user.last_name }}</p>
             <p><strong>Subject:</strong> {{ teacher.subject }}</p>
         {% endif %}
+    </div>
+
+    <!-- 🔹 Navigation Buttons -->
+    <div class="mt-4">
+        <div class="d-flex gap-3">
+            <a href="{% url 'results-entry' %}" class="btn btn-primary">
+                <i class="bi bi-pencil-square"></i> Enter Results
+            </a>
+            <a href="{% url 'exam-list' %}" class="btn btn-success">
+                <i class="bi bi-journal-text"></i> View Exams
+            </a>
+            <a href="{% url 'attendance-mark' %}" class="btn btn-warning text-white">
+                <i class="bi bi-check2-square"></i> Mark Attendance
+            </a>
+        </div>
     </div>
 </div>
 

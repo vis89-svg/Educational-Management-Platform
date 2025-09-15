@@ -18,7 +18,8 @@ from attendence.serializers import AttendanceSerializer
 from calendar import monthrange
 from datetime import date
 
-
+def landing_page(request):
+    return render(request, "landingpage.html")
 class StudentRegistrationView(APIView):
     template_name = "student_registration.html"
 
