@@ -159,9 +159,8 @@ class AttendanceMarkView(View):
         print("=" * 50)
         
         # Redirect with parameters to see the saved data
-        url = reverse('attendance-list') + f'?class_id={class_id}&date={date}'
+        url = reverse('attendance-list')
         return HttpResponseRedirect(url)
-
 
 class AttendanceListView(View):
     template_name = "attendance_list.html"
@@ -173,38 +172,54 @@ class AttendanceListView(View):
         courses = Course.objects.all()
         class_id = request.GET.get("class_id")
         date_str = request.GET.get("date")
-
-        if date_str:
-            try:
-                date = datetime.strptime(date_str, "%Y-%m-%d").date()
-                print(f"Parsed date for list view: {date}")
-            except ValueError:
-                date = localdate()
-                print(f"Date parsing failed, using today: {date}")
-        else:
-            date = localdate()
-            print(f"No date provided, using today: {date}")
-
-        attendance_records = []
-        if class_id:
-            students = StudentRegistration.objects.filter(class_name_id=class_id)
-            attendance_records = Attendance.objects.filter(
-                student__in=students,
-                date=date
-            ).select_related("student", "student__class_name")
-            
-            print(f"Found {attendance_records.count()} attendance records for class {class_id} on {date}")
-            for record in attendance_records:
-                print(f"  - {record.student.name}: {record.status}")
         
-        # Also check total records in database
-        total_records = Attendance.objects.all().count()
-        print(f"Total attendance records in entire database: {total_records}")
+        # Initialize variables
+        attendance_records = []
+        selected_date = None
+        show_results = False  # Flag to determine if we should show results
+        
+        # ✅ Only process and show results if BOTH class_id and date are provided
+        if class_id and date_str:
+            try:
+                selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+                print(f"Parsed date for list view: {selected_date}")
+                show_results = True
+            except ValueError:
+                print(f"Date parsing failed for: {date_str}")
+                messages.error(request, "Invalid date format.")
+                show_results = False
+        else:
+            # ❌ If class or date missing, don’t auto-show anything
+            selected_date = None
+            show_results = False
 
+        # Get selected course name for display
+        selected_course_name = None
+        if show_results and class_id:
+            try:
+                selected_course = courses.filter(id=class_id).first()
+                if selected_course:
+                    selected_course_name = selected_course.class_name
+                
+                students = StudentRegistration.objects.filter(class_name_id=class_id)
+                attendance_records = Attendance.objects.filter(
+                    student__in=students,
+                    date=selected_date
+                ).select_related("student", "student__class_name")
+                
+                print(f"Found {attendance_records.count()} attendance records for class {class_id} on {selected_date}")
+                for record in attendance_records:
+                    print(f"  - {record.student.name}: {record.status}")
+            except Exception as e:
+                print(f"Error fetching attendance records: {e}")
+                messages.error(request, "Error retrieving attendance records.")
+        
         return render(request, self.template_name, {
             "courses": courses,
             "attendance_records": attendance_records,
             "selected_class": class_id,
-            "selected_date": date,
+            "selected_course_name": selected_course_name,
+            "selected_date": selected_date,
+            "show_results": show_results,
             "today": localdate(),
         })
