@@ -107,35 +107,12 @@
                 <li class="list-group-item">
                     <a href="{% url 'teacher_register' %}">Register New Teacher</a>
                 </li>
-                <li class="list-group-item">
-                    <a href="{% url 'edit_teacher_profile' pk=1 %}">Edit Teacher Profile</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="{% url 'delete_teacher_profile' pk=1 %}">Delete Teacher Profile</a>
-                </li>
+               
             </ul>
         </div>
     </div>
 
-    <!-- 🔹 Exams Section -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0">Exams</h5>
-        </div>
-        <div class="card-body">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-                    <a href="{% url 'exam-list' %}">View All Exams</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="{% url 'exam-edit' pk=1 %}">Edit Exam</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="{% url 'exam-delete' pk=1 %}">Delete Exam</a>
-                </li>
-            </ul>
-        </div>
-    </div>
+    
 
     <!-- 🔹 Courses & Subjects Section -->
     <div class="card mb-4 shadow-sm">

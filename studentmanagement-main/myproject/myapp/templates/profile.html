@@ -14,11 +14,18 @@
     <body class="bg-light">
         <!-- 🔹 Navbar with Logout -->
         <nav class="navbar navbar-light bg-white shadow-sm px-3">
-            <span class="navbar-brand mb-0 h4">My Profile</span>
-            <a href="{% url 'landing' %}" class="btn btn-outline-danger">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
-        </nav>
+    <span class="navbar-brand mb-0 h4">My Profile</span>
+    <div class="d-flex gap-2">
+        <!-- 🔹 Payment Button -->
+        <a href="{% url 'payment-select' %}" class="btn btn-outline-success">
+            <i class="fas fa-credit-card"></i> Payment
+        </a>
+        <!-- 🔹 Logout Button -->
+        <a href="{% url 'landing' %}" class="btn btn-outline-danger">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</nav>
 
         <div class="container mt-4">
             <!-- 🔹 Alerts -->

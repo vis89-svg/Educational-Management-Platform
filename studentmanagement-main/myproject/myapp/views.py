@@ -114,21 +114,16 @@ class ProfileAPIView(APIView):
 
 
 class EditProfileAPIView(APIView):
-
     template_name = "edit_profile.html"
 
     def get_object(self, pk=None):
-
-
         if self.request.session.get("superuser") == "admin" and pk is not None:
             return get_object_or_404(StudentRegistration, id=pk)
-
 
         user_id = self.request.session.get("user_id")
         if not user_id:
             return None
         return get_object_or_404(StudentRegistration, id=user_id)
-
 
     def get(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
@@ -137,8 +132,12 @@ class EditProfileAPIView(APIView):
         if not profile:
             return render(request, self.template_name, {"error": "Profile not found"})
 
-        return render(request, self.template_name, {"student": profile})
-
+        courses = Course.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {"student": profile, "courses": courses},
+        )
 
     def post(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
@@ -153,7 +152,13 @@ class EditProfileAPIView(APIView):
             messages.success(request, "Profile updated successfully.")
             return redirect("admin_profile" if request.session.get("superuser") == "admin" else "profile")
 
-        return render(request, self.template_name, {"student": profile, "errors": serializer.errors})
+        courses = Course.objects.all()
+        return render(
+            request,
+            self.template_name,
+            {"student": profile, "errors": serializer.errors, "courses": courses},
+        )
+
 
 
 class DeleteStudentAPIView(APIView):

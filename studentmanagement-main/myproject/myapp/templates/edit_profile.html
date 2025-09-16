@@ -29,14 +29,14 @@
                 {% endif %}
             </div>
 
+            <!-- Name -->
             <div class="mb-3">
-    <label for="name" class="form-label">Name</label>
-    <input type="text" class="form-control" id="name" name="name" value="{{ student.name }}">
-    {% if errors.name %}
-        <div class="text-danger small">{{ errors.name|join:", " }}</div>
-    {% endif %}
-</div>
-
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ student.name }}">
+                {% if errors.name %}
+                    <div class="text-danger small">{{ errors.name|join:", " }}</div>
+                {% endif %}
+            </div>
 
             <!-- Email -->
             <div class="mb-3">
@@ -47,25 +47,32 @@
                 {% endif %}
             </div>
 
-            <!-- Class -->
+            <!-- Class (Fixed: Dropdown from courses) -->
             <div class="mb-3">
-                <label for="class_name" class="form-label">Class</label>
-                <input type="text" class="form-control" id="class_name" name="class_name" value="{{ student.class_name }}">
-                {% if errors.class_name %}
-                    <div class="text-danger small">{{ errors.class_name|join:", " }}</div>
+                <label for="course" class="form-label">Class</label>
+                <select name="class_name" class="form-control" required>
+    <option value="">-- Select Class --</option>
+    {% for course in courses %}
+        <option value="{{ course.id }}" {% if student.class_name.id == course.id %}selected{% endif %}>
+            {{ course.class_name }}
+        </option>
+    {% endfor %}
+</select>
+
+                {% if errors.course %}
+                    <div class="text-danger small">{{ errors.course|join:", " }}</div>
                 {% endif %}
             </div>
 
             <!-- Admission Date -->
             <div class="mb-3">
-    <label for="admission_date" class="form-label">Admission Date</label>
-    <input type="date" class="form-control" id="admission_date" name="admission_date" 
-           value="{{ student.admission_date|date:'Y-m-d' }}">
-    {% if errors.admission_date %}
-        <div class="text-danger small">{{ errors.admission_date|join:", " }}</div>
-    {% endif %}
-</div>
-
+                <label for="admission_date" class="form-label">Admission Date</label>
+                <input type="date" class="form-control" id="admission_date" name="admission_date" 
+                       value="{{ student.admission_date|date:'Y-m-d' }}">
+                {% if errors.admission_date %}
+                    <div class="text-danger small">{{ errors.admission_date|join:", " }}</div>
+                {% endif %}
+            </div>
 
             <!-- Age -->
             <div class="mb-3">
