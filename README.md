@@ -1,4 +1,4 @@
-# 🎓 Educational Management System
+# 🎓 Educational Management System USING DOCKER 
 
 A comprehensive web-based educational management platform designed to streamline academic operations for educational institutions. This system provides robust features for student management, examination handling, result processing, attendance tracking, and secure payment processing.
 
