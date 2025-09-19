@@ -3,24 +3,111 @@
 <head>
   <meta charset="utf-8">
   <title>Attendance Records</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: #fffbea;
+      font-family: 'Poppins', sans-serif;
+      color: #2c2c2c;
+    }
+    h3, h4, h5 {
+      color: #d4af37;
+      font-weight: 600;
+    }
+    .card {
+      border: none;
+      border-radius: 20px;
+      background: #ffffff;
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+      margin-bottom: 2rem;
+    }
+    .btn-primary {
+      background: #d4af37;
+      border: none;
+      font-weight: 500;
+      border-radius: 12px;
+    }
+    .btn-primary:hover {
+      background: #b8932f;
+    }
+    .btn-secondary {
+      background: #6c757d;
+      border: none;
+      color: #fff;
+      font-weight: 500;
+      border-radius: 12px;
+    }
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: #fff;
+    }
+    .btn-outline-primary {
+      border-color: #d4af37;
+      color: #d4af37;
+    }
+    .btn-outline-primary:hover {
+      background: #d4af37;
+      color: #fff;
+    }
+    .btn-outline-danger {
+      border-color: #dc3545;
+      color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+      background: #dc3545;
+      color: #fff;
+    }
+    .table thead {
+      background: #fff8d6;
+      color: #d4af37;
+      font-weight: 600;
+    }
+    .badge-success {
+      background: #28a745;
+    }
+    .badge-danger {
+      background: #dc3545;
+    }
+    .badge-info {
+      background: #17a2b8;
+    }
+    .table-responsive {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .text-muted i {
+      color: #d4af37;
+    }
+    .form-select, .form-control {
+      border-radius: 12px;
+    }
+    .form-label {
+      font-weight: 500;
+    }
+  </style>
 </head>
-<body class="bg-light">
+<body>
+
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Attendance Records</h3>
     <div class="d-flex gap-2">
-        <!-- Home Button -->
         <a href="{% url 'teacher_profile' %}" class="btn btn-outline-primary">
             <i class="bi bi-house-fill"></i> Home
         </a>
-        <!-- Mark Attendance Button -->
         <a href="{% url 'attendance-mark' %}" class="btn btn-outline-danger">
             <i class="bi bi-check2-square"></i> Mark Attendance
         </a>
     </div>
-</div>
-
+  </div>
 
   <!-- Filter Form -->
   <div class="card mb-4">
@@ -62,12 +149,8 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
           Attendance Records 
-          {% if selected_course_name %}
-            - {{ selected_course_name }}
-          {% endif %}
-          {% if selected_date %}
-            - {{ selected_date|date:'F d, Y' }}
-          {% endif %}
+          {% if selected_course_name %}- {{ selected_course_name }}{% endif %}
+          {% if selected_date %}- {{ selected_date|date:'F d, Y' }}{% endif %}
         </h5>
         {% if attendance_records %}
           <span class="badge bg-info">{{ attendance_records|length }} record{{ attendance_records|length|pluralize }}</span>
@@ -77,7 +160,7 @@
         {% if attendance_records %}
           <div class="table-responsive">
             <table class="table table-striped table-hover mb-0">
-              <thead class="table-light">
+              <thead>
                 <tr>
                   <th>Student Name</th>
                   <th>Class</th>
@@ -88,20 +171,14 @@
               <tbody>
                 {% for record in attendance_records %}
                 <tr>
-                  <td>
-                    <strong>{{ record.student.name }}</strong>
-                  </td>
+                  <td><strong>{{ record.student.name }}</strong></td>
                   <td>{{ record.student.class_name.class_name }}</td>
                   <td>{{ record.date|date:'M d, Y' }}</td>
                   <td>
                     {% if record.status == "present" %}
-                      <span class="badge bg-success">
-                        <i class="bi bi-check-circle"></i> Present
-                      </span>
+                      <span class="badge bg-success"><i class="bi bi-check-circle"></i> Present</span>
                     {% else %}
-                      <span class="badge bg-danger">
-                        <i class="bi bi-x-circle"></i> Absent
-                      </span>
+                      <span class="badge bg-danger"><i class="bi bi-x-circle"></i> Absent</span>
                     {% endif %}
                   </td>
                 </tr>
@@ -125,7 +202,6 @@
       </div>
     </div>
   {% else %}
-    <!-- Welcome Message -->
     <div class="card">
       <div class="card-body text-center py-5">
         <div class="text-muted mb-3">
@@ -148,8 +224,6 @@
   {% endif %}
 </div>
 
-<!-- Add Bootstrap Icons (optional, for better UI) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

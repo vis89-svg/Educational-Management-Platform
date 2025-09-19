@@ -1,66 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>Register Student</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #fffbea;
+            color: #2c2c2c;
+        }
+        h3 {
+            color: #d4af37;
+            font-weight: 600;
+        }
+        .card {
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+            padding: 2rem;
+            background: #fffdf2;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            border-radius: 12px;
+        }
+        .btn-primary {
+            background: #d4af37;
+            border: none;
+            font-weight: 500;
+            border-radius: 12px;
+        }
+        .btn-primary:hover {
+            background: #b8932f;
+        }
+        .alert {
+            border-radius: 12px;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
+
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="mb-0">Student Registration</h3>
-    <a href="{% url 'admin_profile' %}" class="btn btn-outline-primary">
-        <i class="bi bi-house-fill"></i> Home
-    </a>
+    <div class="card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Student Registration</h3>
+            <a href="{% url 'admin_profile' %}" class="btn btn-outline-primary">
+                <i class="bi bi-house-fill"></i> Home
+            </a>
+        </div>
+
+        {% if errors %}
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                {% for field, error_list in errors.items %}
+                    <li><strong>{{ field }}:</strong> {{ error_list|join:", " }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Class</label>
+                <select name="class_name" class="form-select" required>
+                    <option value="">-- Select Class --</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.class_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Admission Date</label>
+                <input type="date" name="admission_date" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Age</label>
+                <input type="number" name="age" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
 </div>
 
-    {% if errors %}
-        <div class="alert alert-danger">
-            <ul>
-            {% for field, error_list in errors.items %}
-                <li>{{ field }}: {{ error_list|join:", " }}</li>
-            {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label>Username</label>
-            <input type="text" name="username" class="form-control" required>
-        </div>
-         <div class="mb-3">
-            <label>name</label>
-            <input type="text" name="name" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" class="form-control" required>
-        </div>
-        <div class="mb-3">
-    <label>Class</label>
-    <select name="class_name" class="form-control" required>
-        <option value="">-- Select Class --</option>
-        {% for course in courses %}
-            <option value="{{ course.id }}">{{ course.class_name }}</option>
-        {% endfor %}
-    </select>
-</div>
-
-        <div class="mb-3">
-            <label>Admission Date</label>
-            <input type="date" name="admission_date" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Age</label>
-            <input type="number" name="age" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label>Email</label>
-            <input type="email" name="email" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Register</button>
-    </form>
-</div>
 </body>
 </html>

@@ -1,69 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Exams</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Exams</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: #fffbea;
+      font-family: 'Poppins', sans-serif;
+      color: #2c2c2c;
+    }
+    h3 {
+      color: #d4af37;
+      font-weight: 600;
+    }
+    .exam-card {
+      border: 1px solid #f7e37d;
+      border-radius: 20px;
+      background: #fffdf2;
+      box-shadow: 0 4px 12px rgba(212,175,55,0.1);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 220px; /* make it square-ish */
+      transition: transform 0.2s;
+    }
+    .exam-card:hover {
+      transform: translateY(-5px);
+    }
+    .exam-card h5 {
+      color: #d4af37;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    .exam-card small {
+      color: #6c757d;
+    }
+    .btn-primary { background: #d4af37; border: none; font-weight: 500; }
+    .btn-primary:hover { background: #b8932f; }
+    .btn-success { background: #28a745; border: none; font-weight: 500; }
+    .btn-warning { background: #ffc107; border: none; color: #fff; font-weight: 500; }
+    .btn-danger { background: #dc3545; border: none; font-weight: 500; }
+  </style>
 </head>
-<body class="bg-light">
+<body>
+
 <div class="container mt-5">
-    <div class="card shadow p-4">
-        <h3 class="mb-4">Exams</h3>
-
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-
-        {% for item in exam_list %}
-            <div class="mb-3 p-3 border rounded">
-                <h5>{{ item.exam.title }}</h5>
-                <p>{{ item.exam.description }}</p>
-                <small>{{ item.exam.date }} | {{ item.exam.duration }} mins</small>
-
-                <div class="mt-2">
-                    <strong>Accepted Students:</strong>
-                    {% if item.accepted_students %}
-                        <ul>
-                            {% for student in item.accepted_students %}
-                                <li>{{ student.username }} ({{ student.email }})</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span>None</span>
-                    {% endif %}
-                </div>
-
-                <div class="mt-2">
-                    <strong>Rejected Students:</strong>
-                    {% if item.rejected_students %}
-                        <ul>
-                            {% for student in item.rejected_students %}
-                                <li>{{ student.username }} ({{ student.email }})</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span>None</span>
-                    {% endif %}
-                </div>
-
-                <!-- Optional: Edit/Delete links -->
-                <div class="mt-2">
-                    <a href="{% url 'exam-edit' item.exam.id %}" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="{% url 'exam-delete' item.exam.id %}" class="btn btn-sm btn-danger">Delete</a>
-                </div>
-            </div>
-        {% empty %}
-            <p>No exams available.</p>
-        {% endfor %}
-
-        <div class="text-end mt-3">
-            <a href="{% url 'exam-add' %}" class="btn btn-primary">Add New Exam</a>
-        </div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Exams</h3>
+    <div class="d-flex gap-2">
+        <a href="{% url 'exam-add' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-plus"></i> Add Exam
+        </a>
+        <a href="{% url 'teacher_profile' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-home"></i> Home
+        </a>
     </div>
+</div>
+
+
+  {% if messages %}
+      {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+      {% endfor %}
+  {% endif %}
+
+  <div class="row g-4">
+      {% for item in exam_list %}
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+              <div class="exam-card d-flex flex-column justify-content-between">
+                  <div>
+                      <h5>{{ item.exam.title }}</h5>
+                      <p class="mb-2">{{ item.exam.description }}</p>
+                  </div>
+                  <small>{{ item.exam.date }} | {{ item.exam.duration }} mins</small>
+
+                  <div class="mt-2 d-flex gap-2 flex-wrap">
+                      <a href="{% url 'exam-edit' item.exam.id %}" class="btn btn-warning btn-sm">
+                          <i class="fas fa-edit"></i> Edit
+                      </a>
+                      <a href="{% url 'exam-delete' item.exam.id %}" class="btn btn-danger btn-sm">
+                          <i class="fas fa-trash-alt"></i> Delete
+                      </a>
+                  </div>
+              </div>
+          </div>
+      {% empty %}
+          <p class="text-muted">No exams available.</p>
+      {% endfor %}
+  </div>
+
+  
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

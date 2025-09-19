@@ -17,6 +17,7 @@ from attendence.models import Attendance
 from attendence.serializers import AttendanceSerializer
 from calendar import monthrange
 from datetime import date
+from payment.models import ExamPayment
 
 def landing_page(request):
     return render(request, "landingpage.html")
@@ -74,6 +75,10 @@ class LoginAPIView(APIView):
 
   # adjust path if needed
 
+
+
+from django.utils.timezone import now
+
 class ProfileAPIView(APIView):
     template_name = "profile.html"
 
@@ -87,29 +92,42 @@ class ProfileAPIView(APIView):
         except StudentRegistration.DoesNotExist:
             return render(request, self.template_name, {"error": "User not found"})
 
+        # 🔹 Get all exams (existing)
         exams = Exam.objects.all()
 
-        # 🔹 Get selected month & year from query params (default = current month)
-        today = date.today()
+        # 🔹 Get only the 5 most recent upcoming exams (fixed)
+        today = now().date()  # works for both DateField & DateTimeField
+        recent_exams = (
+            Exam.objects.filter(date__gte=today)
+            .order_by("date")[:5]
+        )
+
+        # 🔹 Get selected month & year (default = current)
         month = int(request.GET.get("month", today.month))
         year = int(request.GET.get("year", today.year))
 
-        # 🔹 Fetch attendance for that student + month
+        # 🔹 Attendance records
         attendance_records = Attendance.objects.filter(
             student=user, date__year=year, date__month=month
         ).order_by("date")
+
+        # 🔹 Payment records
+        payments = ExamPayment.objects.filter(student=user).order_by("-created_at")
 
         return render(
             request,
             self.template_name,
             {
                 "user": user,
-                "exams": exams,
+                "exams": exams,               # keep old "all exams"
+                "recent_exams": recent_exams, # 👈 fixed ordering/filtering
                 "month": month,
                 "year": year,
                 "attendance_records": attendance_records,
+                "payments": payments,
             },
         )
+
 
 
 
@@ -177,21 +195,27 @@ class DeleteStudentAPIView(APIView):
 
 
 
+from django.db.models import Q
 
 class AdminProfileAPIView(APIView):
     template_name = "admin_profile.html"
 
     def get(self, request):
-
         if request.session.get("superuser") != "admin":
-
             return render(request, self.template_name, {"students": []})
 
-
+        query = request.GET.get("q", "")
         all_students = StudentRegistration.objects.all()
+
+        if query:
+            all_students = all_students.filter(
+                Q(name__icontains=query) |
+                Q(username__icontains=query) |
+                Q(email__icontains=query) |
+                Q(class_name__class_name__icontains=query)  # ✅ foreign key lookup
+            )
+
         return render(request, self.template_name, {"students": all_students})
-
-
 
 class ForgotPasswordView(APIView):
     template_name = "forgot_password.html"

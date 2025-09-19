@@ -2,19 +2,25 @@
 <html>
 <head>
     <title>Edit Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body style="background: #fffbea; font-family: 'Poppins', sans-serif; color: #2c2c2c;">
+
 <div class="container mt-5">
-    <div class="card shadow p-4">
-        <h3 class="mb-4">Edit Profile</h3>
+    <div class="card shadow p-4" style="border-radius: 20px;">
+        <h3 class="mb-4" style="color: #d4af37;">Edit Profile</h3>
 
         {% if message %}
-            <div class="alert alert-success">{{ message }}</div>
+            <div class="alert alert-success" style="border-radius:12px;">{{ message }}</div>
         {% endif %}
 
         {% if error %}
-            <div class="alert alert-danger">{{ error }}</div>
+            <div class="alert alert-danger" style="border-radius:12px;">{{ error }}</div>
         {% endif %}
 
         <form method="post">
@@ -22,8 +28,8 @@
 
             <!-- Username -->
             <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="username" name="username" value="{{ student.username }}">
+                <label class="form-label">Username</label>
+                <input type="text" class="form-control" name="username" value="{{ student.username }}">
                 {% if errors.username %}
                     <div class="text-danger small">{{ errors.username|join:", " }}</div>
                 {% endif %}
@@ -31,8 +37,8 @@
 
             <!-- Name -->
             <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ student.name }}">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="name" value="{{ student.name }}">
                 {% if errors.name %}
                     <div class="text-danger small">{{ errors.name|join:", " }}</div>
                 {% endif %}
@@ -40,25 +46,24 @@
 
             <!-- Email -->
             <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ student.email }}">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" value="{{ student.email }}">
                 {% if errors.email %}
                     <div class="text-danger small">{{ errors.email|join:", " }}</div>
                 {% endif %}
             </div>
 
-            <!-- Class (Fixed: Dropdown from courses) -->
+            <!-- Class -->
             <div class="mb-3">
-                <label for="course" class="form-label">Class</label>
-                <select name="class_name" class="form-control" required>
-    <option value="">-- Select Class --</option>
-    {% for course in courses %}
-        <option value="{{ course.id }}" {% if student.class_name.id == course.id %}selected{% endif %}>
-            {{ course.class_name }}
-        </option>
-    {% endfor %}
-</select>
-
+                <label class="form-label">Class</label>
+                <select name="class_name" class="form-select">
+                    <option value="">-- Select Class --</option>
+                    {% for course in courses %}
+                        <option value="{{ course.id }}" {% if student.class_name.id == course.id %}selected{% endif %}>
+                            {{ course.class_name }}
+                        </option>
+                    {% endfor %}
+                </select>
                 {% if errors.course %}
                     <div class="text-danger small">{{ errors.course|join:", " }}</div>
                 {% endif %}
@@ -66,9 +71,8 @@
 
             <!-- Admission Date -->
             <div class="mb-3">
-                <label for="admission_date" class="form-label">Admission Date</label>
-                <input type="date" class="form-control" id="admission_date" name="admission_date" 
-                       value="{{ student.admission_date|date:'Y-m-d' }}">
+                <label class="form-label">Admission Date</label>
+                <input type="date" class="form-control" name="admission_date" value="{{ student.admission_date|date:'Y-m-d' }}">
                 {% if errors.admission_date %}
                     <div class="text-danger small">{{ errors.admission_date|join:", " }}</div>
                 {% endif %}
@@ -76,8 +80,8 @@
 
             <!-- Age -->
             <div class="mb-3">
-                <label for="age" class="form-label">Age</label>
-                <input type="number" class="form-control" id="age" name="age" value="{{ student.age }}">
+                <label class="form-label">Age</label>
+                <input type="number" class="form-control" name="age" value="{{ student.age }}">
                 {% if errors.age %}
                     <div class="text-danger small">{{ errors.age|join:", " }}</div>
                 {% endif %}
@@ -85,19 +89,21 @@
 
             <!-- Password -->
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" value="{{ student.password }}">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" name="password" value="{{ student.password }}">
                 {% if errors.password %}
                     <div class="text-danger small">{{ errors.password|join:", " }}</div>
                 {% endif %}
             </div>
-           
+
             <!-- Submit -->
-            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="submit" class="btn btn-primary" style="border-radius:12px; font-weight:500; background:#d4af37; border:none;">
+                Update
+            </button>
         </form>
 
         {% if errors %}
-            <div class="alert alert-danger mt-3">
+            <div class="alert alert-danger mt-3" style="border-radius:12px;">
                 <ul class="mb-0">
                     {% for field, msgs in errors.items %}
                         <li><strong>{{ field }}:</strong> {{ msgs|join:", " }}</li>
@@ -107,5 +113,7 @@
         {% endif %}
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

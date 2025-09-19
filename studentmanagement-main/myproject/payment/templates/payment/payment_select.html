@@ -2,133 +2,149 @@
 {% load static %}
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Select Payment</title>
-        <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-        />
-    </head>
-    <body class="bg-light">
-        <div class="container py-5">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <!-- Messages -->
-                    {% if messages %}
-                    <div>
-                        {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} mb-2">
-                            {{ message }}
-                        </div>
-                        {% endfor %}
+<head>
+    <meta charset="UTF-8" />
+    <title>Select Payment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #fffbea;
+            color: #2c2c2c;
+        }
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+        }
+        .card-header {
+            background: #d4af37;
+            border-radius: 20px 20px 0 0;
+            font-weight: 600;
+        }
+        .card-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .btn-success {
+            background: #d4af37;
+            border: none;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+        .btn-success:hover {
+            background: #b8932f;
+        }
+        .btn-outline-light {
+            border-radius: 12px;
+        }
+        label {
+            font-weight: 500;
+        }
+        .form-select, .form-control {
+            border-radius: 12px;
+        }
+        .form-check-label {
+            font-weight: 400;
+        }
+        .alert {
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                
+                <!-- Messages -->
+                {% if messages %}
+                <div>
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} mb-2">
+                        {{ message }}
                     </div>
-                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
 
-                    <div class="card shadow-lg rounded-3">
-                        <div
-                            class="card-header text-center bg-primary text-white"
-                        >
-                            <h4>Select Exam & Payment Method</h4>
-                        </div>
-                        <div class="card-body">
-                            <form method="post">
-                                {% csrf_token %}
+                <!-- Payment Card -->
+                <div class="card shadow-lg rounded-3">
+                    <div class="card-header text-white d-flex justify-content-between align-items-center">
+                        <h4>Select Exam & Payment Method</h4>
+                        <a href="{% url 'profile' %}" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-house-fill"></i> Home
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
 
-                                <!-- Exam selection -->
-                                <div class="mb-3">
-                                    <label for="exam" class="form-label"
-                                        >Choose Exam</label
-                                    >
-                                    <select
-                                        name="exam_id"
-                                        id="exam"
-                                        class="form-select"
-                                        required
-                                    >
-                                        <option value="">
-                                            -- Select Exam --
-                                        </option>
-                                        {% for exam in exams %}
-                                        <option value="{{ exam.id }}">
-                                            {{ exam.title }}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
+                            <!-- Exam selection -->
+                            <div class="mb-3">
+                                <label for="exam" class="form-label">Choose Exam</label>
+                                <select name="exam_id" id="exam" class="form-select" required>
+                                    <option value="">-- Select Exam --</option>
+                                    {% for exam in exams %}
+                                    <option value="{{ exam.id }}">{{ exam.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Payment method -->
+                            <div class="mb-3">
+                                <label class="form-label">Payment Method</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="method" value="cash" id="methodCash" required>
+                                    <label class="form-check-label" for="methodCash">Cash (Admin Approval)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="method" value="razorpay" id="methodRazorpay" required>
+                                    <label class="form-check-label" for="methodRazorpay">Razorpay (Online Payment)</label>
                                 </div>
 
-                                <!-- Payment method -->
-                                <div class="mb-3">
-                                    <label class="form-label"
-                                        >Payment Method</label
-                                    >
-                                    <div class="form-check">
-                                        <input
-                                            class="form-check-input"
-                                            type="radio"
-                                            name="method"
-                                            value="cash"
-                                            id="methodCash"
-                                            required
-                                        />
-                                        <label
-                                            class="form-check-label"
-                                            for="methodCash"
-                                            >Cash (Admin Approval)</label
-                                        >
-                                    </div>
-                                    <div class="form-check">
-                                        <input
-                                            class="form-check-input"
-                                            type="radio"
-                                            name="method"
-                                            value="razorpay"
-                                            id="methodRazorpay"
-                                            required
-                                        />
-                                        <label
-                                            class="form-check-label"
-                                            for="methodRazorpay"
-                                            >Razorpay (Online Payment)</label
-                                        >
-                                    </div>
-
-                                    <!-- Cash amount input -->
-                                    <div id="cash_amount_field" style="display:none; margin-top:10px;">
-                                        <label for="amount" class="form-label">Enter Cash Amount (₹)</label>
-                                        <input type="number" name="amount" id="amount" min="1" class="form-control" />
-                                    </div>
+                                <!-- Razorpay amount input -->
+                                <div id="cash_amount_field" style="display:none; margin-top:10px;">
+                                    <label for="amount" class="form-label">Enter Amount (₹)</label>
+                                    <input type="number" name="amount" id="amount" min="1" class="form-control" />
                                 </div>
+                            </div>
 
-                                <div class="d-grid">
-                                    <button
-                                        type="submit"
-                                        class="btn btn-success"
-                                    >
-                                        Proceed
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-success">
+                                    Proceed
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+                <!-- End Card -->
+
             </div>
         </div>
+    </div>
 
-        <script>
-            const cashField = document.getElementById("cash_amount_field");
-            cashField.style.display = "none"; // hide by default
+    <script>
+        const cashField = document.getElementById("cash_amount_field");
+        cashField.style.display = "none"; // hide by default
 
-            document.querySelectorAll('input[name="method"]').forEach((el) => {
-                el.addEventListener('change', function() {
-                    if (this.value === "razorpay") {
-                        cashField.style.display = "block";
-                    } else {
-                        cashField.style.display = "none"; // hide for Cash
-                    }
-                });
+        document.querySelectorAll('input[name="method"]').forEach((el) => {
+            el.addEventListener('change', function() {
+                if (this.value === "razorpay") {
+                    cashField.style.display = "block";
+                } else {
+                    cashField.style.display = "none"; // hide for Cash
+                }
             });
-        </script>
-    </body>
+        });
+    </script>
+</body>
 </html>
-<!-- templates/payment_select.html working -->

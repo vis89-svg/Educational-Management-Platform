@@ -1,34 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>View Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <style>
+        body {
+            background: #fffbea;
+            font-family: 'Poppins', sans-serif;
+            color: #2c2c2c;
+        }
+        h3 {
+            color: #d4af37;
+            font-weight: 600;
+        }
+        .card {
+            border: none;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .form-control, .form-select {
+            border-radius: 12px;
+        }
+        .btn-primary {
+            background: #d4af37;
+            border: none;
+            font-weight: 500;
+            border-radius: 12px;
+        }
+        .btn-primary:hover {
+            background: #b8932f;
+        }
+        .btn-outline-primary {
+            border-color: #d4af37;
+            color: #d4af37;
+            border-radius: 12px;
+        }
+        .btn-outline-primary:hover {
+            background: #d4af37;
+            color: #fff;
+        }
+        .btn-outline-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+            border-radius: 12px;
+        }
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+        table thead {
+            background: #fff8d6;
+            color: #d4af37;
+            font-weight: 600;
+        }
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        p {
+            font-size: 0.95rem;
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 <div class="container mt-5">
-    <h3>View Results</h3>
 
-    <form method="get" class="mb-4">
-        <div class="container mt-3">
-    <div class="d-flex justify-content-end gap-2">
-    <!-- Profile Button -->
-    <a href="{% url 'teacher_profile' %}" class="btn btn-outline-primary">
-        <i class="bi bi-person-circle"></i> Profile
-    </a>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>View Results</h3>
+        <div class="d-flex gap-2">
+            <a href="{% url 'teacher_profile' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-person-circle"></i> Profile
+            </a>
+            <a href="{% url 'results-entry' %}" class="btn btn-outline-secondary btn-sm">
+                Result Entry
+            </a>
+        </div>
+    </div>
 
-    <!-- Result Entry Button -->
-    <a href="{% url 'results-entry' %}" class="btn btn-outline-danger">
-         Result Entry
-    </a>
-</div>
-
-</div>
-        <div class="row mb-3">
-            <div class="col">
-                <label>Class</label>
-                <select name="class_id" class="form-control" required>
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Class</label>
+                <select name="class_id" class="form-select" required>
                     <option value="">-- Select Class --</option>
                     {% for course in classes %}
                         <option value="{{ course.id }}" {% if course.id|stringformat:"s" == selected_class %}selected{% endif %}>
@@ -37,9 +107,9 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col">
-                <label>Exam</label>
-                <select name="exam_id" class="form-control" required>
+            <div class="col-md-6">
+                <label class="form-label">Exam</label>
+                <select name="exam_id" class="form-select" required>
                     <option value="">-- Select Exam --</option>
                     {% for exam in exams %}
                         <option value="{{ exam.id }}" {% if exam.id|stringformat:"s" == selected_exam %}selected{% endif %}>
@@ -48,34 +118,43 @@
                     {% endfor %}
                 </select>
             </div>
-        </div>
-        <button type="submit" class="btn btn-primary">Load Results</button>
-    </form>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-outline-secondary btn-sm mt-2">Load Results</button>
+            </div>
+        </form>
+    </div>
 
+    <!-- Results Table -->
     {% if flat_results %}
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Student</th>
-                {% for subject in subjects %}
-                    <th>{{ subject.subject_name }}</th>
-                {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in flat_results %}
-                <tr>
-                    <td>{{ row.student.name }}</td>
-                    {% for mark in row.marks %}
-                        <td>{{ mark }}</td>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        {% for subject in subjects %}
+                            <th>{{ subject.subject_name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in flat_results %}
+                    <tr>
+                        <td>{{ row.student.name }}</td>
+                        {% for mark in row.marks %}
+                            <td>{{ mark }}</td>
+                        {% endfor %}
+                    </tr>
                     {% endfor %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                </tbody>
+            </table>
+        </div>
+    </div>
     {% else %}
-        <p>No results to display. Please select a class and exam.</p>
+        <p class="text-muted">No results to display. Please select a class and exam.</p>
     {% endif %}
+
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
