@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Work Details - {{ work.title }}</title>
+</head>
+<body>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <h2>{{ work.title }}</h2>
+    <p>{{ work.description }}</p>
+    <p>Course: {{ work.course.name }}</p>
+    <p>Created: {{ work.created_at }}</p>
+
+    <h3>Student Submissions</h3>
+    {% for item in student_submissions %}
+        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+            <h4>{{ item.student.full_name }}</h4>
+            
+            {% if item.submission %}
+                <p><strong>Status:</strong> {{ item.submission.status }}</p>
+                <p><strong>Submitted:</strong> {{ item.submission.created_at }}</p>
+                
+                {% if item.submission.answer_file %}
+                    <p><strong>File:</strong> <a href="{{ item.submission.answer_file.url }}" target="_blank">Download</a></p>
+                {% endif %}
+                
+                {% if item.submission.status == 'PENDING' %}
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="submission_id" value="{{ item.submission.id }}">
+                        <button type="submit" name="action" value="accept" style="background: green; color: white;">
+                            Accept
+                        </button>
+                        <button type="submit" name="action" value="reject" style="background: red; color: white;">
+                            Reject
+                        </button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <p style="color: gray;"><em>No submission yet</em></p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <a href="{% url 'teacher_work_list' %}">← Back to Work List</a>
+</body>
+</html>

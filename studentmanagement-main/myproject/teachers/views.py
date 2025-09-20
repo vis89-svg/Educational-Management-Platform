@@ -1,4 +1,4 @@
-from django.shortcuts import render ,redirect
+from django.shortcuts import render ,redirect,reverse
 from .models import Teacher
 from .serializers import TeacherSerializer
 from rest_framework.views import APIView
@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from works.models import Work
+from works.serializers import WorkSerializer
+
 class TeacherResgister(APIView):
     template_name = "teacher_register.html"
 
@@ -30,7 +33,14 @@ class TeacherResgister(APIView):
         if "text/html" in request.META.get("HTTP_ACCEPT", ""):
             return render(request, self.template_name, {"errors": serializer.errors})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Teacher
+from works.models import Work, Submission  # Import from works app
+from myapp.models import StudentRegistration
 
 class ProfileView(APIView):
     template_name = "teacher_profile.html"
@@ -49,11 +59,83 @@ class ProfileView(APIView):
                 return render(request, self.template_name, {"error": "Teacher profile not found"})
             return Response({"error": "Teacher profile not found"}, status=status.HTTP_404_NOT_FOUND)
 
+        # Fetch teacher's works
+        works = Work.objects.filter(teacher=teacher).order_by("-created_at")
+
+        # Check if managing a specific work
+        work_id = request.GET.get('work_id')
+        selected_work = None
+        student_submissions = []
+        
+        if work_id:
+            try:
+                selected_work = Work.objects.get(id=work_id, teacher=teacher)
+                submissions = Submission.objects.filter(work=selected_work)
+                students = StudentRegistration.objects.filter(class_name=selected_work.course)
+                
+                for student in students:
+                    submission = submissions.filter(student=student).first()
+                    student_submissions.append({
+                        "student": student,
+                        "submission": submission
+                    })
+            except Work.DoesNotExist:
+                messages.error(request, "Work not found")
+
         if "text/html" in request.META.get("HTTP_ACCEPT", ""):
-            return render(request, self.template_name, {"teacher": teacher})
+            return render(request, self.template_name, {
+                "teacher": teacher,
+                "works": works,
+                "selected_work": selected_work,
+                "student_submissions": student_submissions,
+            })
 
         serializer = TeacherSerializer(teacher)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        """Handle submission status updates from the profile page"""
+        user_id = request.session.get('user_id')
+        if not user_id:
+            messages.error(request, "Not logged in")
+            return redirect("teacher_login")
+
+        try:
+            teacher = Teacher.objects.get(user__id=user_id)
+        except Teacher.DoesNotExist:
+            messages.error(request, "Teacher profile not found")
+            return redirect("teacher_login")
+
+        submission_id = request.POST.get("submission_id")
+        action = request.POST.get("action")
+        work_id = request.POST.get("work_id")
+        
+        if not submission_id or not action:
+            messages.error(request, "Invalid submission data")
+            return redirect("teacher_profile")
+            
+        try:
+            submission = Submission.objects.get(id=submission_id, work__teacher=teacher)
+            
+            if action == "accept":
+                submission.status = "ACCEPTED"
+                messages.success(request, f"Accepted submission from {submission.student.username}")
+            elif action == "reject":
+                submission.status = "REJECTED"
+                messages.success(request, f"Rejected submission from {submission.student.username}")
+            else:
+                messages.error(request, "Invalid action")
+                return redirect("teacher_profile")
+                
+            submission.save()
+            
+        except Submission.DoesNotExist:
+            messages.error(request, "Submission not found")
+        
+        # Redirect back to profile with work_id to show the same work
+        if work_id:
+            return redirect(f"{reverse('teacher_profile')}?work_id={work_id}")
+        return redirect("teacher_profile")
 
 class EditProfileView(APIView):
     template_name = "teacher_edit_profile.html"

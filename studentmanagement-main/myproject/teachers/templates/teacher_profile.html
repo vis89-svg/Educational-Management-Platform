@@ -30,7 +30,7 @@
       color: #d4af37;
       margin: 0;
     }
-    .btn-primary, .btn-success, .btn-warning {
+    .btn-primary, .btn-success, .btn-warning, .btn-outline-danger {
       font-weight: 500;
       border-radius: 12px;
     }
@@ -68,6 +68,17 @@
       width: 120px;
       display: inline-block;
     }
+    table th {
+      background: #fff6d6;
+      font-weight: 600;
+    }
+    table td, table th {
+      vertical-align: middle !important;
+    }
+    .badge {
+      font-size: 0.85rem;
+      padding: 0.4em 0.6em;
+    }
   </style>
 </head>
 <body>
@@ -81,6 +92,16 @@
 </div>
 
 <div class="container">
+
+  <!-- Display Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
 
   <!-- Profile Card with Avatar -->
   <div class="card shadow-sm">
@@ -103,7 +124,7 @@
   </div>
 
   <!-- Navigation Buttons -->
-  <div class="d-flex gap-3 flex-wrap">
+  <div class="d-flex gap-3 flex-wrap mb-4">
     <a href="{% url 'results-entry' %}" class="btn btn-primary">
       <i class="fas fa-pencil-alt"></i> Enter Results
     </a>
@@ -114,6 +135,163 @@
       <i class="fas fa-check-square"></i> Mark Attendance
     </a>
   </div>
+
+  <!-- Works Navigation Buttons -->
+  <div class="d-flex gap-3 flex-wrap mb-4">
+    <a href="{% url 'teacher_create_work' %}" class="btn btn-success">
+      <i class="fas fa-plus-circle"></i> Create Work
+    </a>
+    <a href="{% url 'teacher_work_list' %}" class="btn btn-primary">
+      <i class="fas fa-list"></i> View Works
+    </a>
+  </div>
+
+  <!-- Works Section -->
+  <div class="card shadow-sm">
+    <h5 class="fw-semibold mb-3">Works Created</h5>
+    {% if works %}
+      <table class="table table-hover align-middle text-center">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Class</th>
+            <th>Submissions</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for work in works %}
+          <tr>
+            <td>{{ work.title }}</td>
+            <td>{{ work.course.name }}</td>
+            <td>{{ work.submission_set.count }}</td>
+            <td>
+              {% for submission in work.submission_set.all %}
+                {% if submission.status == "REVIEWING" %}
+                  <span class="badge bg-warning text-dark">Reviewing</span>
+                {% elif submission.status == "ACCEPTED" %}
+                  <span class="badge bg-success">Accepted</span>
+                {% elif submission.status == "REJECTED" %}
+                  <span class="badge bg-danger">Rejected</span>
+                {% endif %}
+              {% empty %}
+                <span class="text-muted">No submissions</span>
+              {% endfor %}
+            </td>
+            <td>
+              <!-- ✅ FIXED: Changed to use query parameter for work management -->
+              <a href="?work_id={{ work.id }}" class="btn btn-primary btn-sm">
+                Manage
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="text-muted">No works created yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- ✅ Manage Submissions Section -->
+  {% if selected_work %}
+  <div class="card shadow-sm mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-semibold mb-0">Manage Submissions: {{ selected_work.title }}</h5>
+      <!-- ✅ ADDED: Back button to return to works list -->
+      <a href="{% url 'teacher_profile' %}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-arrow-left"></i> Back to Works
+      </a>
+    </div>
+
+    {% if student_submissions %}
+    <table class="table table-striped table-bordered">
+      <thead class="table-light">
+        <tr>
+          <th>Student</th>
+          <th>Submission</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in student_submissions %}
+        <tr>
+          <td>
+            <!-- ✅ FIXED: Better student name display -->
+            {% if item.student.full_name %}
+              {{ item.student.full_name }}
+            {% else %}
+              {{ item.student.username }}
+            {% endif %}
+          </td>
+          <td>
+            {% if item.submission %}
+              {% if item.submission.answer_file %}
+                <a href="{{ item.submission.answer_file.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-download"></i> Download
+                </a>
+              {% else %}
+                <span class="text-muted">No file</span>
+              {% endif %}
+            {% else %}
+              <span class="text-muted">Not submitted</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if item.submission %}
+              {% if item.submission.status == "REVIEWING" %}
+                <span class="badge bg-warning text-dark">Reviewing</span>
+              {% elif item.submission.status == "ACCEPTED" %}
+                <span class="badge bg-success">Accepted</span>
+              {% elif item.submission.status == "REJECTED" %}
+                <span class="badge bg-danger">Rejected</span>
+              {% endif %}
+            {% else %}
+              <span class="text-muted">N/A</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if item.submission and item.submission.status == "REVIEWING" %}
+              <form method="post" class="d-flex gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="submission_id" value="{{ item.submission.id }}">
+                <!-- ✅ ADDED: work_id to maintain context -->
+                <input type="hidden" name="work_id" value="{{ selected_work.id }}">
+                <button type="submit" name="action" value="accept" class="btn btn-success btn-sm">
+                  <i class="fas fa-check"></i> Accept
+                </button>
+                <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">
+                  <i class="fas fa-times"></i> Reject
+                </button>
+              </form>
+            {% elif item.submission %}
+              <span class="text-muted">{{ item.submission.status|title }}</span>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- ✅ ADDED: Summary stats -->
+    <div class="mt-3">
+      <small class="text-muted">
+        <i class="fas fa-info-circle"></i>
+        Total Students: {{ student_submissions|length }} | 
+        Submissions: {% for item in student_submissions %}{% if item.submission %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %} | 
+        Pending Review: {% for item in student_submissions %}{% if item.submission.status == "REVIEWING" %}{{ forloop.counter0|add:1 }}{% endif %}{% endfor %}
+      </small>
+    </div>
+    
+    {% else %}
+      <p class="text-muted">No students in this class or no submissions yet.</p>
+    {% endif %}
+  </div>
+  {% endif %}
 
 </div>
 

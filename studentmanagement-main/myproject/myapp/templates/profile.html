@@ -135,32 +135,73 @@
       </div>
     </div>
   </div>
-<!-- Exams -->
+
+  <!-- Exams -->
+  <div class="card shadow-sm p-4 mb-4">
+    <h5 class="fw-semibold mb-3">Upcoming Examinations</h5>
+    {% if recent_exams %}
+    <table class="table table-hover align-middle text-center">
+      <thead>
+        <tr>
+          <th>Title</th><th>Description</th><th>Date</th><th>Duration</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for exam in recent_exams %}
+        <tr>
+          <td>{{ exam.title }}</td>
+          <td>{{ exam.description }}</td>
+          <td>{{ exam.date|date:"Y-m-d" }}</td>
+          <td>{{ exam.duration }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="text-muted">No upcoming exams available.</p>
+    {% endif %}
+  </div>
+
+  <!-- Works -->
 <div class="card shadow-sm p-4 mb-4">
-  <h5 class="fw-semibold mb-3">Upcoming Examinations</h5>
-  {% if recent_exams %}
+  <h5 class="fw-semibold mb-3">Assignments</h5>
+  {% if works_with_submissions %}
   <table class="table table-hover align-middle text-center">
     <thead>
       <tr>
-        <th>Title</th><th>Description</th><th>Date</th><th>Duration</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Course</th>
+        <th>Status / Action</th>
       </tr>
     </thead>
     <tbody>
-      {% for exam in recent_exams %}
+      {% for item in works_with_submissions %}
       <tr>
-        <td>{{ exam.title }}</td>
-        <td>{{ exam.description }}</td>
-        <td>{{ exam.date|date:"Y-m-d" }}</td>
-        <td>{{ exam.duration }}</td>
+        <td>{{ item.work.title }}</td>
+        <td>{{ item.work.description }}</td>
+        <td>{{ item.work.course.name }}</td>
+        <td>
+          {% if item.submission %}
+            {% if item.submission.status == "REVIEWING" %}
+              <span class="badge bg-warning text-dark">Pending</span>
+            {% elif item.submission.status == "ACCEPTED" %}
+              <span class="badge bg-success">Accepted</span>
+            {% elif item.submission.status == "REJECTED" %}
+              <span class="badge bg-danger">Rejected</span>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'student_submit_work' item.work.id %}" class="btn btn-primary btn-sm">Submit</a>
+          {% endif %}
+        </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
   {% else %}
-    <p class="text-muted">No upcoming exams available.</p>
+    <p class="text-muted">No works/assignments available.</p>
   {% endif %}
 </div>
-
 
   <!-- Payments -->
   <div class="card shadow-sm p-4 mb-4">
@@ -215,7 +256,6 @@
         <option value="10">October</option>
         <option value="11">November</option>
         <option value="12">December</option>
-        <!-- ... rest months -->
       </select>
       <button class="btn btn-primary">Filter</button>
     </form>

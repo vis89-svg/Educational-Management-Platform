@@ -18,7 +18,8 @@ from attendence.serializers import AttendanceSerializer
 from calendar import monthrange
 from datetime import date
 from payment.models import ExamPayment
-
+from works.models import Work, Submission   # 👈 just import
+from works.serializers import WorkSerializer, SubmissionSerializer
 def landing_page(request):
     return render(request, "landingpage.html")
 class StudentRegistrationView(APIView):
@@ -39,6 +40,8 @@ class StudentRegistrationView(APIView):
         return render(request, self.template_name, {"courses": courses, "errors": serializer.errors})
 
 from django.contrib.auth.models import User
+
+
 
 class LoginAPIView(APIView):
     template_name = "login.html"
@@ -75,60 +78,66 @@ class LoginAPIView(APIView):
 
   # adjust path if needed
 
-
-
 from django.utils.timezone import now
+
+
 
 class ProfileAPIView(APIView):
     template_name = "profile.html"
-
+    
     def get(self, request):
+        # ✅ Get logged-in student from session
         user_id = request.session.get('user_id')
         if not user_id:
             return render(request, self.template_name, {"error": "Unauthorized"})
-
+        
         try:
             user = StudentRegistration.objects.get(id=user_id)
         except StudentRegistration.DoesNotExist:
             return render(request, self.template_name, {"error": "User not found"})
-
-        # 🔹 Get all exams (existing)
+        
+        # 🔹 Exams
         exams = Exam.objects.all()
-
-        # 🔹 Get only the 5 most recent upcoming exams (fixed)
-        today = now().date()  # works for both DateField & DateTimeField
-        recent_exams = (
-            Exam.objects.filter(date__gte=today)
-            .order_by("date")[:5]
-        )
-
-        # 🔹 Get selected month & year (default = current)
+        today = now().date()
+        recent_exams = Exam.objects.filter(date__gte=today).order_by("date")[:5]
+        
+        # 🔹 Get selected month & year (default = current) - FIXED TO MATCH
         month = int(request.GET.get("month", today.month))
         year = int(request.GET.get("year", today.year))
-
-        # 🔹 Attendance records
+        
+        # 🔹 Attendance records - FIXED TO MATCH
         attendance_records = Attendance.objects.filter(
             student=user, date__year=year, date__month=month
         ).order_by("date")
-
-        # 🔹 Payment records
+        
+        # 🔹 Payments
         payments = ExamPayment.objects.filter(student=user).order_by("-created_at")
-
-        return render(
-            request,
-            self.template_name,
-            {
-                "user": user,
-                "exams": exams,               # keep old "all exams"
-                "recent_exams": recent_exams, # 👈 fixed ordering/filtering
-                "month": month,
-                "year": year,
-                "attendance_records": attendance_records,
-                "payments": payments,
-            },
-        )
-
-
+        
+        # 🔹 Works & Submissions
+        works = Work.objects.filter(course=user.class_name)
+        submissions = Submission.objects.filter(student=user)
+        submission_map = {s.work.id: s for s in submissions}
+        
+        # Preprocess works for template
+        works_with_submissions = []
+        for work in works:
+            submission = submission_map.get(work.id)  # None if not submitted
+            works_with_submissions.append({
+                "work": work,
+                "submission": submission
+            })
+        
+        # ✅ Render with correct request argument - FIXED TO MATCH
+        return render(request, self.template_name, {
+            "user": user,
+            "exams": exams,
+            "recent_exams": recent_exams,
+            "month": month,  # ADDED TO MATCH
+            "year": year,    # ADDED TO MATCH
+            "attendance_records": attendance_records,
+            "payments": payments,
+            "works_with_submissions": works_with_submissions
+        })
 
 
 class EditProfileAPIView(APIView):

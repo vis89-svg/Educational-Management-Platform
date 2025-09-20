@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Create Work</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+      <label class="form-label">Class</label>
+      <select name="course" class="form-select" required>
+        {% for c in courses %}
+          <option value="{{ c.id }}">{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      <input type="text" name="title" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Upload PDF</label>
+      <input type="file" name="work_file" class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Assign Work</button>
+  </form>
+</div>
+{% endblock %}
