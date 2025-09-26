@@ -26,6 +26,7 @@ A comprehensive web-based educational management platform designed to streamline
 - **Transaction Management**: Complete payment history and receipt generation
 - **Fee Structure**: Flexible fee management for different examination types
 - **Payment Notifications**: Automated payment confirmation and reminders
+-  **With automatic ADMIT CARD generation ost payment. **
 
 ### 🔔 Notification System
 - **Exam Alerts**: Timely notifications for upcoming examinations
