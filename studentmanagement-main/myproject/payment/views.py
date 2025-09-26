@@ -13,6 +13,11 @@ from .models import ExamPayment
 from Exam.models import Exam
 from myapp.models import StudentRegistration
 
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import inch
+
 
 # Razorpay client init (use keys from settings.py)
 razorpay_client = razorpay.Client(
@@ -152,3 +157,57 @@ class AdminCashApprovalView(View):
         return redirect("payment-admin")
 
 #alterned
+
+
+
+
+
+class HallTicketView(View):
+    def get(self, request, exam_id):
+        student_id = request.session.get("user_id")
+        if not student_id:
+            messages.error(request, "You must be logged in.")
+            return redirect("payment-select")
+
+        student = get_object_or_404(StudentRegistration, id=student_id)
+        exam = get_object_or_404(Exam, id=exam_id)
+
+        # Check payment
+        try:
+            payment = ExamPayment.objects.get(student=student, exam=exam)
+        except ExamPayment.DoesNotExist:
+            messages.error(request, "No payment record found.")
+            return redirect("payment-select")
+
+        if payment.status not in ["success", "approved"]:
+            messages.error(request, "Payment not completed. Hall ticket unavailable.")
+            return redirect("payment-select")
+
+        # Create PDF response
+        response = HttpResponse(content_type="application/pdf")
+        response["Content-Disposition"] = (
+            f'attachment; filename="hall_ticket_{student.username}_{exam.id}.pdf"'
+        )
+
+        # Build PDF
+        p = canvas.Canvas(response, pagesize=A4)
+        width, height = A4
+
+        # Header
+        p.setFont("Helvetica-Bold", 16)
+        p.drawCentredString(width / 2, height - 80, "Examination Hall Ticket")
+
+        # Student details (✅ fixed fields)
+        p.setFont("Helvetica", 12)
+        p.drawString(100, height - 150, f"Name: {student.name}")
+        p.drawString(100, height - 180, f"Class: {student.class_name}")
+        p.drawString(100, height - 210, f"Exam: {exam.title}")
+        p.drawString(100, height - 240, f"Date: {exam.date.strftime('%d-%m-%Y')}")
+
+        # Footer
+        p.setFont("Helvetica-Oblique", 10)
+        
+
+        p.showPage()
+        p.save()
+        return response
